@@ -1,0 +1,66 @@
+ORG 07C00H ;指示位置
+MOV AX , CS;
+MOV DS , AX;
+MOV ES , AX;
+CALL SHOW_HELLO;
+CALL SHOW_MEM;
+CALL DELAY
+CALL DELAY
+CALL DELAY
+CALL DELAY
+CALL DELAY
+CALL CLEAR
+JMP $;
+
+SHOW_HELLO:
+    MOV AX,MES_HELLO
+    MOV BP,AX; 导入字符串
+    MOV CX,len_HELLO
+    MOV AX,01301H;
+    MOV BX,000cH;
+    MOV DX,0H;
+    INT 10H;
+    RET;
+
+SHOW_MEM:
+    MOV  BP,MES_MEM;
+    MOV  AH, 088H
+    INT  15H;获取扩展内存大小放到了ax里面
+    MOV  [BP+len_MEM],AX;结果在Ax里面 2字节
+    MOV  CX,len_MEM+2;
+    MOV  AX,01301H;
+    MOV  BX,000cH;
+    MOV  DX,0100H;
+    INT  10H;
+    RET;
+
+CLEAR:
+    MOV AX,0600H
+    MOV BX,00700H
+    MOV CX,0H;
+    MOV DX,184FH
+    INT 10H
+    RET;
+
+DELAY:
+    MOV AX , 0CFFFH
+DELAY_1:
+    MOV CX , 0FFFFH 
+DELAY_2:
+    DEC CX
+    JNZ DELAY_2;
+    DEC AX
+    JNZ DELAY_1;
+    RET;
+
+
+    
+
+
+MES_HELLO: DB "HELLO, THIS IS OS WORLD"
+len_HELLO  equ  $ - MES_HELLO 
+MES_MEM: DB "THIS MemSize IS "
+len_MEM equ $ - MES_MEM
+TIMES 510 - ($ - $$)  DB 0
+
+DW 0xAA55
