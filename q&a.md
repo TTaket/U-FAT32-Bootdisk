@@ -104,6 +104,12 @@ Ans：
    中断向量表 段页表。。
    硬件参数信息存放在固定位置
 
+#### 有助于操作系统编写的工具 - bochs
+
+提出时间：2023/8/23
+解决时间：2023/8/23
+Ans：[Windows下Bochs的简单使用_bochs windows_的博客-CSDN博客](https://blog.csdn.net/lhl2014123/article/details/101867572)
+
 #### 我需要负责硬件驱动的编写吗 ？ 或者至少编译进来？
 
 提出时间：2023/8/22
@@ -151,14 +157,32 @@ Ans：
 提出时间：2023/8/22
 解决时间：2023/8/22
 Ans：
+[维基百科的解释](https://zh.wikipedia.org/zh-hans/%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80)
+![image-20230822140149982](https://gitee.com/TTaket/typora-image/raw/master/image-20230822140149982.png)
 
 
+
+
+
+
+
+#### 怎么从硬盘指定位置读数据 ? 
+
+提出时间：2023/8/21
+解决时间：
+Ans：
+
+​	我们采取的ban'fa办法是LBA方式 也就是利用端口进行输入读入![image-20230823122252945](https://gitee.com/TTaket/typora-image/raw/master/image-20230823122252945.png)
 
 #### 文件系统相关内容 如何实现文件系统
 
 提出时间：2023/8/21
 解决时间：
 Ans：
+
+
+
+
 
 
 

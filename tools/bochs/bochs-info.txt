@@ -1,0 +1,22 @@
+# 指定虚拟机的内存大小为32M
+megs:32
+
+# 指定虚拟机的BIOS镜像
+romimage: file=BIOS-bochs-latest
+vgaromimage: file=VGABIOS-lgpl-latest
+
+# 告诉Bochs，该虚拟机加载了一个叫做mydisk.img的硬盘镜像作为主盘，ata1为副盘
+# 第二行的CHS参数就填刚刚记下来的参数
+ata0: enabled=1,ioaddr1=0x1f0,ioaddr2=0x3f0,irq=14
+ata0-master:type=disk,path=c.img,mode=flat,cylinders=20,heads=16,spt=63
+# 从硬盘启动
+boot:disk
+
+# 指定日志文件，里面有各种运行时信息
+log: bochsout.txt
+
+# 不使用鼠标
+mouse: enabled=0
+
+# 指定键盘映射
+keyboard: keymap=x11-pc-us.map
