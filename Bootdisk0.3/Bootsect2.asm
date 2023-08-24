@@ -1,0 +1,35 @@
+BOOTSECT_BASE_ADDR EQU 0X9000         	;操作系统应该被加载到的地址
+SECTION BOOTSECT VSTART=BOOTSECT_BASE_ADDR
+    ;CALL CLEAR
+    ORG  BOOTSECT_BASE_ADDR;指示位置
+    MOV AX , CS;
+    MOV DS , AX;
+    MOV ES , AX;
+    CALL CLEAR
+    CALL SHOW_HELLO
+    JMP $
+
+SHOW_HELLO:
+    MOV AX,WELCOME_INFO
+    MOV BP,AX; 导入字符串
+    MOV  CX,WELCOME_INFO_Len
+    MOV  AX,01301H;
+    MOV  BX,000cH;
+    MOV  DX,0000H;
+    INT  10H;
+    RET;
+
+CLEAR:
+    MOV AX,0600H
+    MOV BX,00700H
+    MOV CX,0H;
+    MOV DX,184FH
+    INT 10H
+    RET;
+
+WELCOME_INFO: db "THIS IS Bootsect2"
+WELCOME_INFO_Len equ $ - WELCOME_INFO
+
+
+times 510-($-$$) db 0
+db 0x55,0xaa

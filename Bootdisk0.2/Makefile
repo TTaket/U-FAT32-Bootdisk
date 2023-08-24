@@ -9,14 +9,14 @@ default :
 
 
 # 清除文件
-To_CLEAN_file:
+To_Clean_file:
 	del Clean_disk.bin
 	del Loader.bin 
 	del MBR.bin
 	
 
 # 格式化硬盘
-To_CLEAN_disk:
+To_Clean_disk:
 	../tools/make.exe Clean_disk
 	../tools/dd if=Clean_disk.bin of=../disk.vhd bs=512 count=1
 	../tools/dd if=Clean_disk.bin of=../disk.vhd bs=512 count=1 seek=1
