@@ -21,21 +21,17 @@ default :
 	$(MAKE) To_Disk
 
 #=========0级行为===============
-#用户直接调用 顶级行为 调用一级行为
+#用户直接调用 顶级行为 调用1级行为
 To_Debug:
 	$(MAKE) Clean_Debug
 	$(MAKE) Clean_file
-	$(MAKE) MBR	
-	$(MAKE) Bootsect1 
-	$(MAKE) Bootsect2 
+	$(MAKE) NeedFile
 	$(MAKE) Updata_Debug
 
 To_Disk:
 	$(MAKE) Clean_disk
 	$(MAKE) Clean_file
-	$(MAKE) MBR	
-	$(MAKE) Bootsect1
-	$(MAKE) Bootsect2
+	$(MAKE) NeedFile
 	$(MAKE) Updata_Disk
 #===============================
 
@@ -68,6 +64,12 @@ Updata_Debug:
 	$(DD) if=MBR.bin of=$(TAR_DEBUG) bs=512 count=1
 	$(DD) if=Bootsect1.bin of=$(TAR_DEBUG) bs=512 count=1 seek=20
 	$(DD) if=Bootsect2.bin of=$(TAR_DEBUG) bs=512 count=1 seek=50
+
+#生成需要文件：
+NeedFile:
+	$(MAKE) MBR	
+	$(MAKE) Bootsect1
+	$(MAKE) Bootsect2
 #===============================
 
 #=========2级行为===============
