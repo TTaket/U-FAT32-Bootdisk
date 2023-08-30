@@ -42,26 +42,26 @@ SECTION MBR VSTART=MBR_BASE_ADDR
 			       ; 下标从0开始，所以0x18=24,0x4f=79
     INT 10H
 
-    ; MOV BYTE [GS: 0X00], '*'
-    ; MOV BYTE [GS: 0X01], 0XA4 ; A表示绿色背景闪烁，4表示前景色为红色
+    MOV BYTE [GS: 0X00], '*'
+    MOV BYTE [GS: 0X01], 0XA4 ; A表示绿色背景闪烁，4表示前景色为红色
 
-    ; MOV BYTE [GS: 0X02], '*'
-    ; MOV BYTE [GS: 0X03], 0XA4
+    MOV BYTE [GS: 0X02], '*'
+    MOV BYTE [GS: 0X03], 0XA4
 
-    ; MOV BYTE [GS: 0X04], 'M'
-    ; MOV BYTE [GS: 0X05], 0XA4
+    MOV BYTE [GS: 0X04], 'M'
+    MOV BYTE [GS: 0X05], 0XA4
 
-    ; MOV BYTE [GS: 0X06], 'B'
-    ; MOV BYTE [GS: 0X07], 0XA4
+    MOV BYTE [GS: 0X06], 'B'
+    MOV BYTE [GS: 0X07], 0XA4
 
-    ; MOV BYTE [GS: 0X08], 'R'
-    ; MOV BYTE [GS: 0X09], 0XA4
+    MOV BYTE [GS: 0X08], 'R'
+    MOV BYTE [GS: 0X09], 0XA4
 
-    ; MOV BYTE [GS: 0X0a], '*'
-    ; MOV BYTE [GS: 0X0b], 0XA4
+    MOV BYTE [GS: 0X0a], '*'
+    MOV BYTE [GS: 0X0b], 0XA4
 
-    ; MOV BYTE [GS: 0X0c], '*'
-    ; MOV BYTE [GS: 0X0d], 0XA4
+    MOV BYTE [GS: 0X0c], '*'
+    MOV BYTE [GS: 0X0d], 0XA4
 
 
     ;读取硬盘
@@ -327,13 +327,13 @@ READ_DISK:
 ;第13、14、15、16字节 本分区的总扇区数。
 
 ;当前分区表
-;    指定第一分区为主分区-活动分区 扇区数量10个 起始扇区是从逻辑扇区20开始
-;    指定第二分区为主分区 扇区数量10个 起始扇区是从逻辑扇区50开始
+;    指定第一分区为主分区-活动分区 扇区数量100个 起始扇区是从逻辑扇区20开始
+;    指定第二分区为主分区 扇区数量100个 起始扇区是从逻辑扇区120开始
 times 446 -($-$$) db 0
 DISK_PARTITIONED_TABLE0:
-    DPT0 db 0x80,0x00,0x14,0x00,0x0B,0x00,0x1e,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x0a
+    DPT0 db 0x80,0x00,0x14,0x00,0x0B,0x01,0x38,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x24
 DISK_PARTITIONED_TABLE1:
-    DPT1 db 0x00,0x00,0x32,0x00,0x0B,0x00,0x3c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x0a
+    DPT1 db 0x00,0x01,0x39,0x00,0x0B,0x03,0x1c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x24
 DISK_PARTITIONED_TABLE2:
     DPT2 db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 DISK_PARTITIONED_TABLE3:

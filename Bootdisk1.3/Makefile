@@ -33,13 +33,13 @@ default :
 #用户直接调用 顶级行为 调用1级行为
 To_Debug:
 	$(MAKE) Clean_Debug
-	$(MAKE) Clean_file
+#	$(MAKE) Clean_file
 #   $(MAKE) NeedFile 这部分工作由linux makefile 完成
 	$(MAKE) Updata_Debug
 
 To_Disk:
 	$(MAKE) Clean_disk
-	$(MAKE) Clean_file
+#	$(MAKE) Clean_file
 #   $(MAKE) NeedFile 这部分工作由linux makefile 完成
 	$(MAKE) Updata_Disk
 #===============================
@@ -69,14 +69,14 @@ Clean_Debug:
 # 导入磁盘
 Updata_Disk: 
 	$(DD) if=MBR.bin of=$(TAR_DISK) bs=512 count=1
-	$(DD) if=Bootsect.bin of=$(TAR_DISK) bs=512 count=1 seek=20
-	$(DD) if=system.bin of=$(TAR_DISK) bs=512 count=10 seek=21
+	$(DD) if=Bootsect.bin of=$(TAR_DISK) bs=512 count=10 seek=20
+	$(DD) if=system.bin of=$(TAR_DISK) bs=512 count=10 seek=30
 
 # 导入DEBUG镜像
 Updata_Debug:
 	$(DD) if=MBR.bin of=$(TAR_DEBUG) bs=512 count=1
-	$(DD) if=Bootsect.bin of=$(TAR_DEBUG) bs=512 count=1 seek=20
-	$(DD) if=system.bin of=$(TAR_DEBUG) bs=512 count=10 seek=21
+	$(DD) if=Bootsect.bin of=$(TAR_DEBUG) bs=512 count=10 seek=20
+	$(DD) if=system.bin of=$(TAR_DEBUG) bs=512 count=10 seek=30
 #===============================
 
 #=========2级行为===============

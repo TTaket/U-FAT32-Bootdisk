@@ -1,33 +1,19 @@
-#### 1.2
 
-接下来我们需要实现一批次的库函数
+#### 1.3
 
-1.2.1  利用c实现库函数 提高编程效率
+接下来的任务是围绕实模式和保护模式 要做到切换到保护模式
 
-1. 在指定位置打印字符串
-     printInPos(char * msg,uint16_t len,uint8_t row,uint8_t col);
+1.3.1 首先 我们应该设计更加结构化的逻辑
 
-2. 在光标位置打印字符
+![内存结构](https://gitee.com/TTaket/typora-image/raw/master/内存结构.png)
 
-   extern void  putchar (char*c);
-3. 读入一个字符
+1.3.2 切换到保护模式
+因为进入到保护模式的时候 我们原有的BIOS就会因为寻址方式的问题发生改变 这时候需要写出新的idt表 但是工程量过于巨大 所以我们的保护模式目前只是进去一下之后再出来
 
-   extern char  getch();
+GDTR：
 
-基于上述的汇编实现库函数 我们可以用c扩展出以下函数
+![1693376423303](https://gitee.com/TTaket/typora-image/raw/master/1693376423303.png)
 
-1. 获取字符串长度
+GDT表详解：
 
-   uint16_t strlen(char *s) 
-
-2. 在光标处打印字符串
-
-   void print(char *s)
-
-3. 读入字符串
-
-   void readBuf(char*buffer,uint16_tmaxlen)
-
-1.2.2 实现简单shell 
-
-我们已经有一批次的库函数了 可以开始着手我们的shell界面了 利用库函数 和 c 实现shell界面
+![1693375180885](https://gitee.com/TTaket/typora-image/raw/master/1693375180885.png)
