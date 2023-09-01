@@ -1,7 +1,8 @@
 {
     "cph.general.saveLocation": "",
     "files.associations": {
-        "strint.h": "c"
+        "strint.h": "c",
+        "fat32.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

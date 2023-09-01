@@ -1,0 +1,24 @@
+#include "brk_h.h"
+//读取某一块某一偏移量开始的一些n个字节数量 - 不支持跨块读入
+uint32_t read_nbyte(uint32_t lba , uint32_t offset ,uint32_t n , char* info){
+    //临时缓冲区
+    char tmp_buffer[512];
+    //取出这一块
+    bread(lba , tmp_buffer , 1);
+    strncpy(info , tmp_buffer + offset , n);
+    //默认
+    return 0;
+}
+
+
+//写入某一块某一偏移量开始的一些n个字节数量 - 不支持跨块写
+uint32_t write_nbyte(uint32_t lba , uint32_t offset ,uint32_t n , char* info){
+    //临时缓冲区
+    char tmp_buffer[512];
+    //取出这一块
+    bread(lba , tmp_buffer , 1);
+    strncpy(tmp_buffer + offset, info , n);
+    bwrite(lba , tmp_buffer , 1);
+    //默认
+    return 0;
+}
