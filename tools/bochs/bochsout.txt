@@ -43,7 +43,7 @@
 00000000000i[USBCTL] Pluggable USB devices
 00000000000i[USBCTL]   floppy mouse tablet keypad keyboard hub disk cdrom
 00000000000i[USBCTL]   printer
-00000000000i[MEM0  ] allocated memory at 000002B04C784040. after alignment, vector=000002B04C785000
+00000000000i[MEM0  ] allocated memory at 0000020273F41040. after alignment, vector=0000020273F42000
 00000000000i[MEM0  ] 32.00MB
 00000000000i[MEM0  ] mem block size = 0x00020000, blocks=256
 00000000000i[MEM0  ] rom at 0xfffe0000/131072 ('BIOS-bochs-latest')
@@ -52,7 +52,7 @@
 00000000000i[MEM0  ] Register memory access handlers: 0x0000000a0000 - 0x0000000bffff
 00000000000i[VGA   ] interval=200000, mode=realtime
 00000000000i[VGA   ] VSYNC using standard mode
-00000000000i[WINGUI] Desktop window dimensions: 1920 x 1080
+00000000000i[WINGUI] Desktop window dimensions: 2048 x 1280
 00000000000i[WINGUI] Number of Mouse Buttons = 8
 00000000000i[WINGUI] IME disabled
 00000000000i[KEYMAP] Loading keymap from 'x11-pc-us.map'
@@ -64,7 +64,7 @@
 00000000000i[DEV   ] PIIX3 PCI-to-ISA bridge present at device 1, function 0
 00000000000i[PLUGIN] init_dev of 'cmos' plugin device by virtual method
 00000000000i[CMOS  ] Using local time for initial clock
-00000000000i[CMOS  ] Setting initial clock to: Wed Aug 30 18:25:57 2023 (time0=1693391157)
+00000000000i[CMOS  ] Setting initial clock to: Fri Sep  1 15:32:08 2023 (time0=1693553528)
 00000000000i[PLUGIN] init_dev of 'dma' plugin device by virtual method
 00000000000i[DMA   ] channel 4 used by cascade
 00000000000i[PLUGIN] init_dev of 'pic' plugin device by virtual method
@@ -204,7 +204,7 @@
 00000322306i[BIOS  ] ram_end=32MB
 00000363093i[BIOS  ] Found 1 cpu(s)
 00000376746i[BIOS  ] bios_table_addr: 0x000f9d98 end=0x000fcc00
-00000604012i[WINGUI] dimension update x=720 y=400 fontheight=16 fontwidth=9 bpp=8
+00000602480i[WINGUI] dimension update x=720 y=400 fontheight=16 fontwidth=9 bpp=8
 00000704562i[PCI   ] i440FX PMC write to PAM register 59 (TLB Flush)
 00001032497i[P2ISA ] PCI IRQ routing: PIRQA# set to 0x0b
 00001032521i[P2ISA ] PCI IRQ routing: PIRQB# set to 0x09
