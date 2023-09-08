@@ -20,4 +20,6 @@
 
       绑定过程![image-20230908105410894](https://gitee.com/TTaket/typora-image/raw/master/image-20230908105410894.png)
 
-      ls：![ls](https://gitee.com/TTaket/typora-image/raw/master/ls.png)
+      ls：![ls](https://gitee.com/TTaket/typora-image/raw/master/ls.png)cd:
+      
+      ![cd](https://gitee.com/TTaket/typora-image/raw/master/cd.png)
