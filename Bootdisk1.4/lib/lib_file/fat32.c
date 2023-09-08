@@ -336,6 +336,7 @@ uint32_t create_clu(){
 //新建文件 提供路径 名字 后缀 属性
 uint32_t create_file(char* path , uint32_t pathlen , char*name, uint32_t namelen ,uint8_t attr){
     int clu = getclu_bypath(path, pathlen);
+    //printintln(clu);
     //找到这个文件的最后一个簇
     while(1){
         uint32_t tmp = getnextclu(clu);
@@ -348,7 +349,7 @@ uint32_t create_file(char* path , uint32_t pathlen , char*name, uint32_t namelen
 
     int avail_siz = clu_available_size(clu);
     uint32_t off = 0;
-    if(avail_siz <= file_info_len){//不足
+    if(avail_siz < file_info_len){//不足
         clu = expand_clu(clu);
         off = 0;
     }else{
@@ -356,51 +357,55 @@ uint32_t create_file(char* path , uint32_t pathlen , char*name, uint32_t namelen
     }
     char tmp_buffer[file_info_len];
     char tmp_file[file_info_len];
-    char tmp_name1[8];
-    char tmp_name2[4];
-    int tmp_name1len , tmp_name2len;
 
     //清空
     bzero(tmp_file ,file_info_len );
-    //处理名字部分
-    for(int i =0;i<namelen;i++){
-        if(name[i] == '.'){
+    //名字处理
+    uint32_t namepointoff = 0;
+    while(namepointoff< namelen){
+        if(name[namepointoff] == (char)'.'){
             break;
         }else{
-            tmp_name1[tmp_name1len++] = name[i] ;
+            namepointoff++;
         }
     }
-    for(int i =tmp_name1len;i<=7;i++ ){
-        tmp_name1[i] = 32;
+    if(((attr & 0x10) !=0) &&(namepointoff != namelen)){//要求是目录 且有小数点
+        return ERR;
+    }
+    if((namepointoff > (uint32_t)8)){//长度溢出 暂时只支持短目录名 所以报错
+        return ERR;
+    }
+    if(((namelen - namepointoff ) >(uint32_t)4)){
+        return ERR;
+    }
+    strncpy(tmp_file+0x00 , name , namepointoff);
+    if(namelen != namepointoff){
+        strncpy(tmp_file+0x08 , name+namepointoff , namelen - namepointoff -1);
     }
 
-    strncpy(tmp_file ,tmp_name1 , 8 );
-    //处理后缀部分
-    for(int i =tmp_name1len+1;i<namelen;i++){
-        tmp_name2[tmp_name2len++] = name[i] ;
-    }
-    for(int i =tmp_name2len;i<=3;i++ ){
-        tmp_name2[tmp_name2len++] = 32;
-    }
-    strncpy(tmp_file+8 ,tmp_name2 , 4 );
 
     //处理属性
     itoa_10_small(tmp_buffer , 1 , attr );
     strncpy(tmp_file+0x0B ,tmp_buffer , 1);
 
-    //文件簇号
-    itoa_10_small(tmp_buffer , 4 , clu);
-    strncpy(tmp_file+0x14 ,tmp_buffer , 2);
-    strncpy(tmp_file+0x1A ,tmp_buffer+2 , 2);
-
-    strncpy(tmp_file+0x1A ,tmp_buffer+2 , 2);
-
-    write_nbyte(get_sec_afteroff(clu , off) , off%DBR_info.Sector_Byte , file_info_len ,tmp_buffer );
+    //非目录暂时不需要考虑文件簇号
+    if(((attr & 0x10) !=0)){//要求是目录
+        //文件簇号
+        itoa_10_small(tmp_buffer , 4 , clu);
+        strncpy(tmp_file+0x14 ,tmp_buffer , 2);
+        strncpy(tmp_file+0x1A ,tmp_buffer+2 , 2);
+    }
+    print_n(tmp_file , file_info_len);
+    printintln(clu);
+    printintln(off);
+    printintln(ClusterToSector(clu));
+    printintln(get_sec_afteroff(clu , off));
+    write_nbyte(get_sec_afteroff(clu , off) , off%DBR_info.Sector_Byte , file_info_len ,tmp_file );
 }
 
 uint32_t get_sec_afteroff(uint32_t clu , uint32_t off){
     uint32_t sec = ClusterToSector(clu);//获得起始扇区
-    uint32_t offbrk = off/DBR_info.Sector_Byte + (((off%DBR_info.Sector_Byte) == 0)? 0 : 1);
+    uint32_t offbrk = off/DBR_info.Sector_Byte;
     return sec + offbrk;
 }
 

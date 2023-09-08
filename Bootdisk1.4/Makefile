@@ -71,7 +71,7 @@ Updata_Disk:
 	$(DD) if=MBR.bin of=$(TAR_DISK) bs=512 count=1
 	$(DD) if=Bootsect.bin of=$(TAR_DISK) bs=512 count=50 seek=20
 	$(DD) if=system.bin of=$(TAR_DISK) bs=512 count=50 seek=70
-#$(DD) if=BOOT.img of=$(TAR_DISK) bs=512 count=100000 seek=1024
+	$(DD) if=BOOT.img of=$(TAR_DISK) bs=512 count=100000 seek=1024
 
 # 导入DEBUG镜像
 Updata_Debug:

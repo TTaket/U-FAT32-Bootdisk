@@ -18,7 +18,11 @@ uint32_t cmd_cd(char * p){
         strncpy(cdpath , p ,strlen(p));
     }else{
         strncpy(cdpath , tmp_glo ,strlen(tmp_glo));
-        strncpy(cdpath+strlen(tmp_glo) , p+2 ,strlen(p+2));
+        if(strlen(tmp_glo) == 1){
+            strncpy(cdpath+strlen(tmp_glo) , p+2 ,strlen(p+2));
+        }else{
+            strncpy(cdpath+strlen(tmp_glo) , p+1 ,strlen(p+1));
+        }
     }
 
     //是否指定路径后有 '/'

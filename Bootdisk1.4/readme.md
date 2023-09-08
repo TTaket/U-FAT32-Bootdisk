@@ -23,3 +23,5 @@
       ls：![ls](https://gitee.com/TTaket/typora-image/raw/master/ls.png)cd:
       
       ![cd](https://gitee.com/TTaket/typora-image/raw/master/cd.png)
+      
+      touch:![touch](https://gitee.com/TTaket/typora-image/raw/master/touch.png)
