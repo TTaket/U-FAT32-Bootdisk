@@ -4,7 +4,7 @@
 
 
 
-struct DBR_info_Struct{
+typedef struct _DBR_info_Struct{
     uint16_t Sector_Byte;//每扇区字节数
     uint8_t  Cluster_Sector;//每簇扇区数
     uint16_t Start_FAT;//fat表的起始位置
@@ -13,22 +13,22 @@ struct DBR_info_Struct{
     uint32_t Cluster_Num;//总共扇区数量
     uint32_t FAT_Size;//fat表的大小
     uint32_t Cluster_RootDir ;//根目录所在的簇号
-};
+}DBR_info_Struct;
 
-struct fsinfo_info_Struct{
+typedef struct _fsinfo_info_Struct{
     uint32_t next_Cluster;//下一个可用簇的位置
     uint32_t available_Cluster;//剩余的空闲簇数
-};
+}fsinfo_info_Struct;
 
 //文件目录项 
-struct file_info_Struct{
+typedef struct _file_info_Struct{
     char name_1[9];//文件名
     char name_2[5];//文件后缀
-    char name_3[13];//文件全名
+    char name_3[14];//文件全名
     uint8_t  file_attr;//文件属性
     uint32_t cluster_pos;//起始簇号
     uint32_t file_size;//文件大小
-};
+}file_info_Struct;
 
 
 //初始化DBR
@@ -47,7 +47,7 @@ uint32_t Update_clunum_available(int change);
 //查询 
 //获得某个clu开始的第off个目录项的内容 返回-1表示有错误 正确返回0
 //这个查询只能查询在这个给clu内的目录项 超出返回-1
-uint32_t getfile_info(uint32_t clu , uint32_t off , struct file_info_Struct * finfo);
+uint32_t getfile_info(uint32_t clu , uint32_t off , file_info_Struct * finfo);
 //根据名字找到起始簇 - 需要传入当前的clu
 //错误返回-1 找到返回clu
 //这是找到这个目录下是否有该名字 换言之如果这个目录大于一个簇 他会到下一个簇中去找

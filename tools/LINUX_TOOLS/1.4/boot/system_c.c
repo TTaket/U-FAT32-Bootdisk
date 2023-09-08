@@ -1,11 +1,13 @@
 #include "stringio_h.h"
 #include "system_h.h"
+#include "fat32.h"
 extern uint32_t cmd_ls(char *p);
 extern uint32_t cmd_cd(char *p);
 extern void cmd_mkdir(char *p);
 extern void cmd_touch(char *p);
 extern void clearScreen();
 extern void poweroff();
+extern DBR_info_Struct DBR_info;
 
 char global_path[PATH_SIZ] = {0};
 
@@ -31,11 +33,15 @@ void startup(){
 }
 
 void show_p(){
-    char * p_str = "LJY_OS :";
+    char * p_str = "LJY_OS:";
     char * p_end = "#";
-	char * tmp_path = global_path;
+	char * tmp_path_1 = "[";
+	char * tmp_path_2 = global_path;
+	char * tmp_path_3 = "]";
     print(p_str);
-    print(tmp_path);
+	print(tmp_path_1);
+    print(tmp_path_2);
+	print(tmp_path_3);
     print(p_end);
 }
 
@@ -63,35 +69,35 @@ void shell(){
 	while(1){
 		show_p();
 		readBuf(cmdStr,BUF_SIZ);
-		getFirstWord(cmdStr,cmdFirstWord);
-		if(strncmp(cmdFirstWord,command[clear],min( strlen(command[clear]) ,strlen(cmdFirstWord) )) == 0){
+		getFirstWord(cmdStr,strlen(cmdStr) , cmdFirstWord);
+		if(strcmp(cmdFirstWord,command[clear]) ==0){
 			clearScreen();
 		}
-		else if(strncmp(cmdFirstWord,command[help] ,min( strlen(command[help]) ,strlen(cmdFirstWord) )) == 0){
+		else if(strcmp(cmdFirstWord,command[help]) ==0){
 			showHelp();
 		}
-		else if(strncmp(cmdFirstWord,command[power_off],min( strlen(command[power_off]) ,strlen(cmdFirstWord) )) == 0){
+		else if(strcmp(cmdFirstWord,command[power_off]) ==0){
         	poweroff();
 		}
-        else if(strncmp(cmdFirstWord,command[ls],min( strlen(command[ls]) ,strlen(cmdFirstWord) )) == 0){
-            getFirstWord(cmdStr + strlen(cmdFirstWord) + 1 ,cmdSecondWord);
+        else if(strcmp(cmdFirstWord,command[ls] ) == 0){
+            getFirstWord(cmdStr + strlen(cmdFirstWord) + 1 ,strlen(cmdStr + strlen(cmdFirstWord) + 1) , cmdSecondWord);
             cmd_ls(cmdSecondWord);
         }
-        else if(strncmp(cmdFirstWord,command[cd],min( strlen(command[cd]) ,strlen(cmdFirstWord) )) == 0){
-            getFirstWord(cmdStr + strlen(cmdFirstWord) + 1 ,cmdSecondWord);
+        else if(strcmp(cmdFirstWord,command[cd]) == 0){
+            getFirstWord(cmdStr + strlen(cmdFirstWord) + 1 ,strlen(cmdStr + strlen(cmdFirstWord) + 1) , cmdSecondWord);
             cmd_cd(cmdSecondWord);
         }
-		else if(strncmp(cmdFirstWord,command[touch],min( strlen(command[touch]) ,strlen(cmdFirstWord) )) == 0){
-            getFirstWord(cmdStr + strlen(cmdFirstWord) + 1 ,cmdSecondWord);
+		else if(strcmp(cmdFirstWord,command[touch]) == 0){
+            getFirstWord(cmdStr + strlen(cmdFirstWord) + 1 ,strlen(cmdStr + strlen(cmdFirstWord) + 1) , cmdSecondWord);
             cmd_touch(cmdSecondWord);
         }
-        else if(strncmp(cmdFirstWord,command[mkdir],min( strlen(command[mkdir]) ,strlen(cmdFirstWord) )) == 0){
-            getFirstWord(cmdStr + strlen(cmdFirstWord) + 1 ,cmdSecondWord);
+        else if(strcmp(cmdFirstWord,command[mkdir]) == 0){
+            getFirstWord(cmdStr + strlen(cmdFirstWord) + 1 ,strlen(cmdStr + strlen(cmdFirstWord) + 1) , cmdSecondWord);
             cmd_mkdir(cmdSecondWord);
         }
 		else{
 			if(cmdFirstWord[0] != 0){
-				char*errMsg = "command not found\r\n";
+				char*errMsg = ":command not found\r\n";
 				print(cmdFirstWord);
 				print(errMsg);
 			}

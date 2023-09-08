@@ -23,32 +23,11 @@ uint32_t MAX_BUFFER = 100;
 
 
 //全局变量
-struct DBR_info_Struct DBR_info;
-struct fsinfo_info_Struct fsinfo_info;
+DBR_info_Struct DBR_info;
+fsinfo_info_Struct fsinfo_info;
 
 
 void init_DBRinfo(){
-
-    //确认fat32 系统位置
-    DBR_pos = 1024;//DBR的lba起始号
-    fsinfo_pos = 0;//fsinfo扇区的起始号filemax
-    FAT1_pos = 0;//FAT1的起始号
-    FAT2_pos = 0;//FAT2的起始号
-    DATA_pos = 0;//数据区的起始号
-
-    //辅助参数
-    file_info_len = 32;//目录项长度为32
-    end_clu = 0x0FFFFFFF;//结束簇
-    fat_clunum = 512/4;//每张fat表能存入的簇信息个数
-    clunum_fileinfo = 0; //每一个簇能存的记录项的数量
-    Maxclunum = 0;//最多有多少个簇 也就是簇的上限是多少
-    clunum_byte = 0;//每一个簇的总字节数量
-
-    clunum_available = 0; //剩余的簇数
-    clunum_next = 0; //下一个簇的位置
-    MAX_BUFFER = 100;
-    struct DBR_info_Struct tmp_DBR_info;
-    // char * tmp = "aaaaaaaaaaaaaaaaaa";
     char DBR[512] = {0};
     // printInPos(tmp , strlen(tmp) , 10 ,5);
     bread(DBR_pos , DBR , 1);
@@ -56,15 +35,14 @@ void init_DBRinfo(){
     //DBR 读取磁盘验证 正确
     //print_n(DBR , 512);
     //初始化
-    tmp_DBR_info.Sector_Byte = (uint16_t)atoi_16_small(DBR+ 0x0B, 2);
-    tmp_DBR_info.Cluster_Sector = (uint8_t)atoi_16_small(DBR+ 0x0D, 1);
-    tmp_DBR_info.Start_FAT = (uint16_t)atoi_16_small(DBR+ 0x0E, 2);
-    tmp_DBR_info.Num_FAT=(uint8_t )atoi_16_small(DBR+ 0x10, 1);
-    tmp_DBR_info.Start_DBR=(uint32_t)atoi_16_small(DBR+ 0x1c, 4);
-    tmp_DBR_info.Cluster_Num=(uint32_t)atoi_16_small(DBR+ 0x20, 4);
-    tmp_DBR_info.FAT_Size=(uint32_t)atoi_16_small(DBR+ 0x24, 4);
-    tmp_DBR_info.Cluster_RootDir=(uint32_t)atoi_16_small(DBR+ 0x2c, 4);
-    DBR_info = tmp_DBR_info;
+    DBR_info.Sector_Byte = (uint16_t)atoi_16_small(DBR+ 0x0B, 2);
+    DBR_info.Cluster_Sector = (uint8_t)atoi_16_small(DBR+ 0x0D, 1);
+    DBR_info.Start_FAT = (uint16_t)atoi_16_small(DBR+ 0x0E, 2);
+    DBR_info.Num_FAT=(uint8_t )atoi_16_small(DBR+ 0x10, 1);
+    DBR_info.Start_DBR=(uint32_t)atoi_16_small(DBR+ 0x1c, 4);
+    DBR_info.Cluster_Num=(uint32_t)atoi_16_small(DBR+ 0x20, 4);
+    DBR_info.FAT_Size=(uint32_t)atoi_16_small(DBR+ 0x24, 4);
+    DBR_info.Cluster_RootDir=(uint32_t)atoi_16_small(DBR+ 0x2c, 4);
     // printInPos(tmp , strlen(tmp) , 12 ,5);
     fsinfo_pos = DBR_info.Start_DBR + 1;//fsinfo扇区的起始号
     FAT1_pos = DBR_info.Start_DBR + DBR_info.Start_FAT;//FAT1的起始号
@@ -75,18 +53,20 @@ void init_DBRinfo(){
     Maxclunum = (uint32_t)DBR_info.Cluster_Num /  (uint32_t)DBR_info.Cluster_Sector ;//偏小一点 但是合理
     // printInPos(tmp , strlen(tmp) , 13 ,5);
     //---DBR数据验证 正确
-    // printint(DBR_info.Sector_Byte);println();
-    // printint(DBR_info.Cluster_Sector);println();
-    // printint(DBR_info.Start_FAT);println();
-    // printint(DBR_info.Num_FAT);println();
-    // printint(DBR_info.Start_DBR);println();
-    // printint(DBR_info.Cluster_Num);println();
-    // printint(DBR_info.FAT_Size);println();
-    // printint(DBR_info.Cluster_RootDir);println();
+    printintln((uint32_t)DBR_info.Sector_Byte);
+    printintln((uint32_t)DBR_info.Cluster_Sector);
+    printintln((uint32_t)DBR_info.Start_FAT);
+    printintln((uint32_t)DBR_info.Num_FAT);
+    printintln((uint32_t)DBR_info.Start_DBR);
+    printintln((uint32_t)DBR_info.Cluster_Num);
+    printintln((uint32_t)DBR_info.FAT_Size);
+    printintln((uint32_t)DBR_info.Cluster_RootDir);
+    //printintln((uint32_t)&DBR_info.Cluster_RootDir);
+    
 }
 
 void init_fsinfo_info(){
-    struct fsinfo_info_Struct tmp_fsinfo_info;
+    fsinfo_info_Struct tmp_fsinfo_info;
     // char * tmp = "bbbbbbbbbbb";
     // printInPos(tmp , strlen(tmp) , 14 ,5);
     char fsinfo[512]={0};
@@ -116,68 +96,48 @@ uint32_t ClusterToSector(uint32_t clu){
 
 
 //获得某个clu开始的第off个目录项的内容 //空的时候返回-1 错误 // 访问到下一个簇的时候返回 -1 
-uint32_t getfile_info(uint32_t clu , uint32_t off , struct file_info_Struct * finfo){
+uint32_t getfile_info(uint32_t clu , uint32_t off , file_info_Struct * finfo){
     //获取扇区值
     uint32_t lba = ClusterToSector(clu);
-    if(off >= clunum_fileinfo){
+    if(off > clunum_fileinfo){
         return ERR;
     }
+    //更改目录号为偏移量
+    off = (off-1) *file_info_len;
     //临时缓冲区
     char tmp_finfo[file_info_len];
+    bzero(tmp_finfo , file_info_len);
     //计算获取第几块合适
-    uint32_t offbrk = (off*file_info_len) / (uint32_t)DBR_info.Sector_Byte + (((off*file_info_len)%(uint32_t)DBR_info.Sector_Byte ==0) ? 0 : 1);
+    uint32_t offbrk = (off / (uint32_t)DBR_info.Sector_Byte);
     //读取出来
-    read_nbyte(offbrk + lba ,(off*file_info_len)%(uint32_t)DBR_info.Sector_Byte , file_info_len , tmp_finfo);
+    read_nbyte(offbrk + lba ,(off)%(uint32_t)DBR_info.Sector_Byte , file_info_len , tmp_finfo);
+    //printintln(offbrk + lba);
     //print_n(tmp_finfo , file_info_len);
     //赋值
-    //name
-    uint32_t name_3off = 0;
-    for(int i = 0;i<=7;i++){
-        if((uint8_t)tmp_finfo[i] == (uint8_t)20){
-            (finfo->name_1)[i]=(uint8_t)0;
-            break;
-        }else{
-            (finfo->name_1)[i] = (uint8_t)tmp_finfo[i];
-            (finfo->name_3)[name_3off++] = (uint8_t)tmp_finfo[i];
-        }
+    //name 前8位是名字 之后的4位是后缀
+    bzero(finfo->name_1 , 9);
+    bzero(finfo->name_2 , 5);
+    bzero(finfo->name_3 , 14);
+    for(int i = 0;i<8;i++){
+        finfo->name_1[i] = ((tmp_finfo[i] == (char)32)?(char)0:tmp_finfo[i]);
     }
-    print_n(finfo->name_1 , 8);
-    println();
-    
-
-    finfo->name_1[8]=(uint8_t)0;
-    
-    for(int i = 0;i<=3;i++){
-        if((uint8_t)tmp_finfo[i+8]==(uint8_t)20){
-            finfo->name_2[i] = (uint8_t)0;
-            break;
-        }else{
-            if(i == 0){
-                (finfo->name_3)[name_3off++] = (uint8_t)'.';
-            }
-            (finfo->name_2)[i] = (uint8_t)tmp_finfo[i+8];
-            (finfo->name_3)[name_3off++] = (uint8_t)tmp_finfo[i+8];
-        }
+    for(int i = 0;i<4;i++){
+        finfo->name_2[i] = ((tmp_finfo[i+8] == (char)32)?(char)0:tmp_finfo[i+8]);
     }
-    print_n(finfo->name_2 , 4);
-    println();
-    (finfo->name_2)[4]=(uint8_t)0;
-    (finfo->name_3)[name_3off]=(uint8_t)0;
-    print_n(finfo->name_3 , 12);
-    println();
-    print(finfo->name_3);
-    println();
-
+    finfo->name_1[8] = (char)0;
+    finfo->name_2[4] = (char)0;
+    
+    strncpy(finfo->name_3,finfo->name_1  ,strlen(finfo->name_1));
+    if(strlen(finfo->name_2) != 0 ){
+        finfo->name_3[strlen(finfo->name_3)] = (char)'.';
+        strncpy(finfo->name_3 + strlen(finfo->name_3),finfo->name_2  ,strlen(finfo->name_2));
+    }
     finfo->file_attr =(uint8_t)atoi_16_small(tmp_finfo+ 0x0B, 1);
     finfo->cluster_pos = (uint32_t) (uint16_t)atoi_16_small(tmp_finfo+ 0x14, 2);
     finfo->cluster_pos = finfo->cluster_pos * (uint32_t)65536;
     finfo->cluster_pos +=(uint32_t)(uint16_t)atoi_16_small(tmp_finfo+ 0x1A, 2);
     finfo->file_size =(uint32_t)atoi_16_small(tmp_finfo+ 0x1C, 4);
-    if(finfo->name_1[0] == 0){
-        return -1;//空的时候返回1 错误
-    }else{
-        return 0;
-    }
+    return;
 }
 
 //找到这个文件的下一个簇
@@ -204,7 +164,7 @@ uint32_t getnextclu(uint32_t now_clu){
 uint32_t getclu_byname(uint32_t now_clu , char * name , uint32_t n){
     uint32_t ret = 0;
     uint32_t offid = 0;
-    struct file_info_Struct tmp_finfo;
+    file_info_Struct tmp_finfo;
 
     while((ret==0)){
         while(1){
@@ -237,7 +197,7 @@ uint32_t getclu_byname(uint32_t now_clu , char * name , uint32_t n){
 uint32_t getoffinclu_byname(uint32_t now_clu , char * name , uint32_t n){
     uint32_t ret = 0;
     uint32_t offid = 0;
-    struct file_info_Struct tmp_finfo;
+    file_info_Struct tmp_finfo;
 
     while((ret==0)){
         while(1){
@@ -314,10 +274,12 @@ uint32_t Update_clunum_available(int change ){
 
 //把一个簇的内容读入到缓冲区里面 
 uint32_t read_clu(char * buffer , uint32_t clu){
-    for(uint32_t i = 0;i<(uint32_t)DBR_info.Cluster_Sector;i++){
-        bread(ClusterToSector(clu)+(uint32_t)i , buffer , 1);
-        //printint(i);
-    }
+    //堆栈区过小暂时禁用
+    bread(ClusterToSector(clu) , buffer , (uint32_t)DBR_info.Cluster_Sector);
+    // for(uint32_t i = 0;i<(uint32_t)DBR_info.Cluster_Sector;i++){
+    //     bread(ClusterToSector(clu)+(uint32_t)i , buffer , 1);
+    //     //printint(i);
+    // }
     
     
     return 0;
@@ -325,17 +287,25 @@ uint32_t read_clu(char * buffer , uint32_t clu){
 
 //返回一个簇剩余空间 32的整数倍
 uint32_t clu_available_size(uint32_t clu){
-    uint32_t ret;
-    char tmpbuffer[clunum_byte];
-    read_clu(tmpbuffer , clu);
-    
-    for(int i = clunum_byte-1;i>=0;i--){
-        if(tmpbuffer[i] == 0){
-            ret++;
+    uint32_t ret =0 ;
+    char tmpbuffer[DBR_info.Sector_Byte];
+    bzero(tmpbuffer , DBR_info.Sector_Byte);
+
+
+    for(int i = DBR_info.Cluster_Sector-1;i>=0;i--){
+        bread(ClusterToSector(clu) + i , tmpbuffer , 1);
+        //print_n(tmpbuffer , 512);
+        for(int j = DBR_info.Sector_Byte-1 ; j>=0;j--){
+            if(tmpbuffer[j] == (char)0){
+                ret++;
+            }else{
+                ret =ret/32*32;
+                return ret;
+            }
         }
     }
     ret =ret/32*32;
-    return ret;
+    return 0;
 }
 //返回一个簇最后的偏移量(簇内) 32的整数倍
 uint32_t clu_off(uint32_t clu){
@@ -410,7 +380,7 @@ uint32_t create_file(char* path , uint32_t pathlen , char*name, uint32_t namelen
         }
     }
     for(int i =tmp_name1len;i<=7;i++ ){
-        tmp_name1[i] = 20;
+        tmp_name1[i] = 32;
     }
 
     strncpy(tmp_file ,tmp_name1 , 8 );
@@ -419,7 +389,7 @@ uint32_t create_file(char* path , uint32_t pathlen , char*name, uint32_t namelen
         tmp_name2[tmp_name2len++] = name[i] ;
     }
     for(int i =tmp_name2len;i<=3;i++ ){
-        tmp_name2[tmp_name2len++] = 20;
+        tmp_name2[tmp_name2len++] = 32;
     }
     strncpy(tmp_file+8 ,tmp_name2 , 4 );
 
@@ -477,7 +447,7 @@ uint32_t del_file(char * path , uint32_t pathlen , char*name, uint32_t namelen){
 //删除目录
 uint32_t del_dir(char * path , uint32_t pathlen ,char*name, uint32_t namelen){
     //遍历这个目录的每一个簇
-    struct file_info_Struct finfo;
+    file_info_Struct finfo;
     
     char namebuffer[MAX_BUFFER];
     char pathbuffer[MAX_BUFFER];

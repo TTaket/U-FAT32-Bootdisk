@@ -27,11 +27,17 @@ extern global_path
 GLOBAL _start
 
 _start:
+    ; ;扩大堆栈范围
+    ; MOV AX , 5000H;
+    ; MOV SS , AX;
+    ; MOV AX , 9000H;
+    ; MOV SP , AX;
     call dword CLEAR;
     call dword init;
     call dword startup;
     call dword init_DBRinfo
     call dword init_fsinfo_info
+
 Key_Board:
     MOV AH , 0;
     INT 16H;

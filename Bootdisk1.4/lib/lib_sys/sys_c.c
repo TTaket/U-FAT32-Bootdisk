@@ -23,8 +23,8 @@ extern uint32_t MAX_BUFFER ;//
 
 
 //全局变量
-extern struct DBR_info_Struct DBR_info;
-extern struct fsinfo_info_Struct fsinfo_info;
+extern DBR_info_Struct DBR_info;
+extern fsinfo_info_Struct fsinfo_info;
 
 extern char global_path[PATH_SIZ];
 
@@ -45,8 +45,8 @@ void init(){
     tmp = clunum_available;
     tmp = clunum_next;
     tmp = MAX_BUFFER;
-    struct DBR_info_Struct tmp1 = DBR_info;
-    struct fsinfo_info_Struct tmp2 = fsinfo_info;
+    DBR_info_Struct tmp1 = DBR_info;
+    fsinfo_info_Struct tmp2 = fsinfo_info;
     char * tmpchar = global_path;
 
 }

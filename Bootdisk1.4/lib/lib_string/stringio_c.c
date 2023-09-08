@@ -17,7 +17,7 @@ void print(char *s){
 }
 
 
-void readBuf(char*buffer,uint16_t maxLen){
+void readBuf(char * buffer , uint32_t maxLen){
 	int i = 0;
 	while(1){
 		char tempc = getch();
@@ -82,16 +82,17 @@ uint32_t strncpy(char *dest, char *src ,uint32_t n){
     uint32_t readnum = 0;
     for(readnum = 0;readnum <n;readnum++){
         dest[readnum ] = src[readnum ];
-    }
+    } 
+    dest[n] = 0;
     return readnum;
 }
 
-uint32_t strncmp(char *dest, char *src ,uint32_t n){
+uint32_t strncmp(char *S1, char *S2 ,uint32_t n){
     int ret = 0;
     for(int i = 0 ;i<n;i++){
-        if(dest[i] == src[i]){
+        if(S1[i] == S2[i]){
             continue;
-        }else if(dest[i] < src[i]){
+        }else if(S1[i] < S2[i]){
             return ERR;
         }else{
             return 1;
@@ -99,10 +100,34 @@ uint32_t strncmp(char *dest, char *src ,uint32_t n){
     }
     return 0;
 }
-void bzero(char * s , int len){
-    for(int i = 0;i<len;i++){
-        s[i]= 0;
+
+uint32_t strcmp(char *S1, char *S2){
+    int ret = 0;
+    if(strlen(S1) == strlen(S2)){
+        return strncmp(S1 , S2 , strlen(S2));
+    }else{
+        if(strlen(S1) > strlen(S2)){
+            if(strncmp(S1 , S2 , strlen(S2)) == 0){
+                return 1;
+            }else{
+                return strncmp(S1 , S2 , strlen(S2));
+            }
+        }else{
+            if(strncmp(S1 , S2 , strlen(S1)) == 0){
+                return ERR;
+            }else{
+                return strncmp(S1 , S2 , strlen(S1));
+            }
+        }
     }
+}
+
+
+void bzero(char * s , uint32_t len){
+    for(int i = 0;i<len;i++){
+        s[i]= (char)0;
+    }
+    return;
 }
 
 //字符串拼接 s1 要 s2 的 n个
@@ -119,9 +144,9 @@ uint32_t strncat(char *s1, char *s2 , char * aim , uint32_t n){
     return len1 + min(n , len2);
 }
 
-void getFirstWord(char*str,char*buf){
+void getFirstWord(char*str,uint32_t strlen,char*buf){
 	int i = 0;
-	while(str[i] && (str[i] != ' ') && (str[i] != '\n')){
+	while(str[i] && (str[i] != ' ') && (str[i] != '\n') && (i<= strlen)){
 		buf[i] = str[i];
 		i++;
 	}
@@ -147,7 +172,7 @@ uint32_t fatherpath(char * path , uint32_t pathlen , char * farpath){
 uint32_t getname(char * path , uint32_t pathlen , char * name){
     int offset =pathlen -1; 
     for(offset; offset>=0;offset--){
-        if(path[pathlen -1] == '/'){
+        if(path[offset] == '/'){
             break;
         }
     }
@@ -167,8 +192,14 @@ void printint(uint32_t num){
     buffer[10] = 0;
     print(buffer);
 }
-void println(){
-    char * tmp ="\n";
+void println(char * s){
+    char * tmp ="\n\r";
+    print(s);
+    print(tmp);
+}
+void printintln(uint32_t num){
+    char * tmp ="\n\r";
+    printint(num);
     print(tmp);
 }
 

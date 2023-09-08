@@ -18,7 +18,7 @@ uint32_t cmd_cd(char * p){
     }
     getname(cdpath , strlen(cdpath) ,  name);
     //确定目标路径是不是目录
-    struct file_info_Struct finfo;
+    file_info_Struct finfo;
     uint32_t now_clu =  getclu_bypath(cdpath , strlen(cdpath));
     uint32_t off = getoffinclu_byname(now_clu , name , strlen(name));
     getfile_info(now_clu , off , &finfo);
