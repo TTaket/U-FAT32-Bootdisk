@@ -3,7 +3,6 @@
 #include "system_h.h" 
 
 extern char global_path[];
-extern uint32_t MAX_BUFFER;
 extern uint32_t file_info_len;
 extern DBR_info_Struct DBR_info;
 
@@ -17,6 +16,7 @@ uint32_t cmd_ls(char * p){
     char *err_getclu = "ERR: no such file";
     char * err_notdir = "this file not dir";
     char * err_Volumelabel ="Volume label";
+    char * err_off = "ERR: err_off";
     uint32_t dir_flag = 0;//指定的为目录
     uint32_t ls_clu = 0;//遍历的簇号
     //确定路径 
@@ -50,6 +50,7 @@ uint32_t cmd_ls(char * p){
             return 0;
         }
         uint32_t off = getoffinclu_byname(now_clu , name , strlen(name));
+        //获取对应信息
         getfile_info(now_clu , off , &finfo_tmp);
         //如果是卷标
         if((finfo_tmp.file_attr & 0x08 ) != 0){
@@ -74,7 +75,7 @@ uint32_t cmd_ls(char * p){
     println(lspath);
     print(debug_3);
     printintln(ls_clu);
-    
+
     //遍历这个目录的每一个簇
     file_info_Struct finfo;
     char namebuffer[MAX_BUFFER];
@@ -85,12 +86,16 @@ uint32_t cmd_ls(char * p){
     while(next_clu!= ERR){
         now_clu = next_clu;
         next_clu = getnextclu(now_clu);
-        //printintln(now_clu);
+        // printintln(now_clu);
         //遍历这个簇里面的所有文件
         uint32_t off = clu_off(now_clu);
-        //printintln(off);
+        if(off == ERR){
+            println(err_off);
+            return 1;
+        }
+        // printintln(off);
         uint32_t filemax = off / file_info_len;
-        //printintln(filemax);
+        // printintln(filemax);
         for(int i = 1;i<=filemax ;i++){
             getfile_info(now_clu ,i , &finfo );
             //删除文件跳过 

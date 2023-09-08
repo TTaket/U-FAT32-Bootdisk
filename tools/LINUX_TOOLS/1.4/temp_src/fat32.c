@@ -19,7 +19,7 @@ uint32_t clunum_byte = 0;//每一个簇的总字节数量
 
 uint32_t clunum_available = 0; //剩余的簇数
 uint32_t clunum_next = 0; //下一个簇的位置
-uint32_t MAX_BUFFER = 100;
+
 
 
 //全局变量
@@ -62,7 +62,7 @@ void init_DBRinfo(){
     printintln((uint32_t)DBR_info.FAT_Size);
     printintln((uint32_t)DBR_info.Cluster_RootDir);
     //printintln((uint32_t)&DBR_info.Cluster_RootDir);
-    
+
 }
 
 void init_fsinfo_info(){
@@ -91,11 +91,11 @@ uint32_t SectorToCluster(uint32_t sec){
 uint32_t ClusterToSector(uint32_t clu){
     int ret = 0;
     ret = ret + DATA_pos;
-    ret +=  (clu - DBR_info.Cluster_RootDir) * DBR_info.Cluster_Sector;
+    ret = ret + (clu - DBR_info.Cluster_RootDir) * (uint32_t)DBR_info.Cluster_Sector;
 }
 
 
-//获得某个clu开始的第off个目录项的内容 //空的时候返回-1 错误 // 访问到下一个簇的时候返回 -1 
+//获得某个clu开始的第off个目录项的内容 //空的时候返回-1 错误 // 访问到下一个簇的时候返回 -1
 uint32_t getfile_info(uint32_t clu , uint32_t off , file_info_Struct * finfo){
     //获取扇区值
     uint32_t lba = ClusterToSector(clu);
@@ -126,7 +126,7 @@ uint32_t getfile_info(uint32_t clu , uint32_t off , file_info_Struct * finfo){
     }
     finfo->name_1[8] = (char)0;
     finfo->name_2[4] = (char)0;
-    
+
     strncpy(finfo->name_3,finfo->name_1  ,strlen(finfo->name_1));
     if(strlen(finfo->name_2) != 0 ){
         finfo->name_3[strlen(finfo->name_3)] = (char)'.';
@@ -135,7 +135,7 @@ uint32_t getfile_info(uint32_t clu , uint32_t off , file_info_Struct * finfo){
     finfo->file_attr =(uint8_t)atoi_16_small(tmp_finfo+ 0x0B, 1);
     finfo->cluster_pos = (uint32_t) (uint16_t)atoi_16_small(tmp_finfo+ 0x14, 2);
     finfo->cluster_pos = finfo->cluster_pos * (uint32_t)65536;
-    finfo->cluster_pos +=(uint32_t)(uint16_t)atoi_16_small(tmp_finfo+ 0x1A, 2);
+    finfo->cluster_pos = finfo->cluster_pos + (uint32_t)(uint16_t)atoi_16_small(tmp_finfo+ 0x1A, 2);
     finfo->file_size =(uint32_t)atoi_16_small(tmp_finfo+ 0x1C, 4);
     return;
 }
@@ -157,39 +157,6 @@ uint32_t getnextclu(uint32_t now_clu){
         return ERR;
     }else{
         return ret;
-    }
-}
-
-//在当前目录下 返回文件名称对应的簇号 return -1 文件没找到 不存在
-uint32_t getclu_byname(uint32_t now_clu , char * name , uint32_t n){
-    uint32_t ret = 0;
-    uint32_t offid = 0;
-    file_info_Struct tmp_finfo;
-
-    while((ret==0)){
-        while(1){
-            if(getfile_info(now_clu , offid , &tmp_finfo) == ERR){
-                break;
-            }else{
-                if(strlen(name) == strlen(tmp_finfo.name_3)){
-                    if(strncmp(tmp_finfo.name_3, name , strlen(name)) ==0 ){
-                        ret = tmp_finfo.cluster_pos;
-                        break;
-                    }
-                }
-            }
-            ++offid;
-        }
-        if(ret !=0){
-            return ret;//找到了
-        }else{
-            now_clu = getnextclu(now_clu);
-            if(now_clu == ERR){
-                return ERR;//没找到
-            }else{
-                offid = 0;
-            }
-        }
     }
 }
 
@@ -221,23 +188,48 @@ uint32_t getoffinclu_byname(uint32_t now_clu , char * name , uint32_t n){
     }
 }
 
-//按照绝对路径找到这个文件的簇
+
+//在当前目录下 返回文件名称对应的簇号 return -1 文件没找到 不存在
+uint32_t getclu_byname(uint32_t now_clu , char * name , uint32_t name_len){
+    file_info_Struct tmp_finfo;
+    uint32_t offid = getoffinclu_byname(now_clu ,name , name_len);
+    //printintln(offid);
+    getfile_info(now_clu , offid , &tmp_finfo);
+    //println(tmp_finfo.name_3);
+    //如果是err 就返回err
+    return tmp_finfo.cluster_pos;
+}
+
+
+//按照绝对路径找到这个文件目录项所在的簇
 uint32_t getclu_bypath(char * path , uint32_t len){
-    char path_name[13];
+    char path_name[20];
+    char fapath[PATH_SIZ];
+    uint32_t falen = 0;
     uint32_t offset = 0;
     uint32_t now_clu = DBR_info.Cluster_RootDir;
-    while(offset != len){
+    if(len == 1){
+        return now_clu;//根路径
+    }
+    falen = fatherpath(path , len , fapath);
+
+    if(falen == 0){
+        return now_clu;//根路径
+    }
+    //更改len
+    while(offset < falen){
         offset++;//offset的位置一定是/
         uint32_t tmpnameoff = 0;
-        while(offset<len){
-            if(path[offset] == '/'){    
+        while(offset<falen){
+            if(fapath[offset] == '/'){
                 break;
             }
-            path_name[tmpnameoff] = path[offset];
+            path_name[tmpnameoff] = fapath[offset];
             offset++;
             tmpnameoff++;
         }
-        path_name[tmpnameoff] = '0';
+        path_name[tmpnameoff] = (char)0;
+        //println(path_name);
         now_clu = getclu_byname(now_clu , path_name , strlen(path_name ));
         if(now_clu == ERR){
             return ERR;
@@ -272,7 +264,7 @@ uint32_t Update_clunum_available(int change ){
     return clunum_available;
 }
 
-//把一个簇的内容读入到缓冲区里面 
+//把一个簇的内容读入到缓冲区里面
 uint32_t read_clu(char * buffer , uint32_t clu){
     //堆栈区过小暂时禁用
     bread(ClusterToSector(clu) , buffer , (uint32_t)DBR_info.Cluster_Sector);
@@ -280,8 +272,8 @@ uint32_t read_clu(char * buffer , uint32_t clu){
     //     bread(ClusterToSector(clu)+(uint32_t)i , buffer , 1);
     //     //printint(i);
     // }
-    
-    
+
+
     return 0;
 }
 
@@ -290,7 +282,6 @@ uint32_t clu_available_size(uint32_t clu){
     uint32_t ret =0 ;
     char tmpbuffer[DBR_info.Sector_Byte];
     bzero(tmpbuffer , DBR_info.Sector_Byte);
-
 
     for(int i = DBR_info.Cluster_Sector-1;i>=0;i--){
         bread(ClusterToSector(clu) + i , tmpbuffer , 1);
@@ -317,7 +308,7 @@ uint32_t clu_off(uint32_t clu){
     }
 }
 
-//新建 
+//新建
 //扩充簇
 uint32_t expand_clu(uint32_t now_clu){
     uint32_t TMP_clunum_next = clunum_next;
@@ -432,7 +423,7 @@ uint32_t del_file(char * path , uint32_t pathlen , char*name, uint32_t namelen){
 
     //找到这个文件的簇
     uint32_t file_clu = getclu_bypath(path , pathlen);
-    
+
     uint32_t next_clu = file_clu;
     while(next_clu != ERR ){
         uint32_t now_clu = next_clu;
@@ -448,7 +439,7 @@ uint32_t del_file(char * path , uint32_t pathlen , char*name, uint32_t namelen){
 uint32_t del_dir(char * path , uint32_t pathlen ,char*name, uint32_t namelen){
     //遍历这个目录的每一个簇
     file_info_Struct finfo;
-    
+
     char namebuffer[MAX_BUFFER];
     char pathbuffer[MAX_BUFFER];
     char newpathbuffer[MAX_BUFFER];
@@ -469,7 +460,7 @@ uint32_t del_dir(char * path , uint32_t pathlen ,char*name, uint32_t namelen){
             }else{
                 del_file(newpathbuffer , newpathlen , finfo.name_3 , strlen(finfo.name_3 ));
             }
-        } 
+        }
         //更新
         change_fat_clu(now_clu , 0);
         Update_clunum_available(+1);

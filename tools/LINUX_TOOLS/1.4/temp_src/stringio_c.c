@@ -3,8 +3,8 @@
 
 
 // Calculate string length
-uint16_t strlen(char *str){
-    uint16_t count = 0;
+uint32_t strlen(char *str){
+    uint32_t count = 0;
     while(str[count++] != 0);
     return count - 1;
 }
@@ -157,11 +157,11 @@ void getFirstWord(char*str,uint32_t strlen,char*buf){
 uint32_t fatherpath(char * path , uint32_t pathlen , char * farpath){
     int offset =pathlen -1; 
     for(offset; offset>=0;offset--){
-        if(path[pathlen -1] == '/'){
+        if(path[offset] == (char)'/'){
             break;
         }
     }
-    if(offset <=0){
+    if(offset <0){
         return ERR;
     }
     strncpy(farpath , path , offset);
@@ -176,7 +176,7 @@ uint32_t getname(char * path , uint32_t pathlen , char * name){
             break;
         }
     }
-    if(offset <=0){
+    if(offset <0){
         return ERR;
     }
     strncpy(name , path + offset+1 , pathlen - offset -1);
