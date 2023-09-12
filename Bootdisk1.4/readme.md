@@ -25,3 +25,7 @@
       ![cd](https://gitee.com/TTaket/typora-image/raw/master/cd.png)
       
       touch:![touch](https://gitee.com/TTaket/typora-image/raw/master/touch.png)
+      
+      mkdir:
+      
+      ![mkdir](https://gitee.com/TTaket/typora-image/raw/master/mkdir.png)

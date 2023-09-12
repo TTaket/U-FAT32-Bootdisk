@@ -31,7 +31,11 @@ uint32_t cmd_ls(char * p){
         strncpy(lspath , p ,strlen(p));
     }else{
         strncpy(lspath , tmp_glo ,strlen(tmp_glo));
-        strncpy(lspath+strlen(tmp_glo) , p+2 ,strlen(p+2));
+        if(strlen(tmp_glo) == 1){
+            strncpy(lspath+strlen(tmp_glo) , p+2 ,strlen(p+2));
+        }else{
+            strncpy(lspath+strlen(tmp_glo) , p+1 ,strlen(p+1));
+        }
     }
 
     //是否指定打印的为目录
@@ -108,6 +112,10 @@ uint32_t cmd_ls(char * p){
             }
             //卷标跳过
             if((finfo.file_attr & (char)0x08 ) != 0){
+                continue;
+            }
+            //隐藏文件跳过
+            if((finfo.file_attr & (char)0x02 ) != 0){
                 continue;
             }
             //printintln(finfo.file_attr);

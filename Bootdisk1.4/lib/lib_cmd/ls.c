@@ -114,6 +114,10 @@ uint32_t cmd_ls(char * p){
             if((finfo.file_attr & (char)0x08 ) != 0){
                 continue;
             }
+            //隐藏文件跳过
+            if((finfo.file_attr & (char)0x02 ) != 0){
+                continue;
+            }
             //printintln(finfo.file_attr);
             println(finfo.name_3);
         } 

@@ -83,7 +83,6 @@ uint32_t strncpy(char *dest, char *src ,uint32_t n){
     for(readnum = 0;readnum <n;readnum++){
         dest[readnum ] = src[readnum ];
     } 
-    dest[n] = 0;
     return readnum;
 }
 

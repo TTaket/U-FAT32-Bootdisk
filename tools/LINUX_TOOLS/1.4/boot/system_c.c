@@ -9,6 +9,8 @@ extern void clearScreen();
 extern void poweroff();
 extern DBR_info_Struct DBR_info;
 
+uint32_t global_clu = 0;
+
 char global_path[PATH_SIZ] = {0};
 
 void startup(){
@@ -30,6 +32,7 @@ void startup(){
 	//初始化根路径
 	global_path[0] = '/';
 	global_path[1] = 0;
+	global_clu = DBR_info.Cluster_RootDir;
 }
 
 void show_p(){
