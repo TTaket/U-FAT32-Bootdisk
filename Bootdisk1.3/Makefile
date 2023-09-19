@@ -22,7 +22,8 @@ OBJCOPY_FLAG = -O binary
 
 #目标定义 
 TAR_DEBUG = $(DEBUG_PATH)c.img
-TAR_DISK = $(BASE_PATH)disk.vhd
+TAR_DISK = $(BASE_PATH)tmp_disk.vhd
+#TAR_DISK = $(BASE_PATH)disk.vhd
 
 
 # 默认动作

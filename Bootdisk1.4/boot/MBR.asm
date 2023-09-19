@@ -42,11 +42,11 @@ SECTION MBR VSTART=MBR_BASE_ADDR
 			       ; 下标从0开始，所以0x18=24,0x4f=79
     INT 10H
 
-    MOV BYTE [GS: 0X00], '*'
-    MOV BYTE [GS: 0X01], 0XA4 ; A表示绿色背景闪烁，4表示前景色为红色
+    ; MOV BYTE [GS: 0X00], '*'
+    ; MOV BYTE [GS: 0X01], 0XA4 ; A表示绿色背景闪烁，4表示前景色为红色
 
-    MOV BYTE [GS: 0X02], '*'
-    MOV BYTE [GS: 0X03], 0XA4
+    ; MOV BYTE [GS: 0X02], '*'
+    ; MOV BYTE [GS: 0X03], 0XA4
 
     MOV BYTE [GS: 0X04], 'M'
     MOV BYTE [GS: 0X05], 0XA4
@@ -57,11 +57,11 @@ SECTION MBR VSTART=MBR_BASE_ADDR
     MOV BYTE [GS: 0X08], 'R'
     MOV BYTE [GS: 0X09], 0XA4
 
-    MOV BYTE [GS: 0X0a], '*'
-    MOV BYTE [GS: 0X0b], 0XA4
+    ; MOV BYTE [GS: 0X0a], '*'
+    ; MOV BYTE [GS: 0X0b], 0XA4
 
-    MOV BYTE [GS: 0X0c], '*'
-    MOV BYTE [GS: 0X0d], 0XA4
+    ; MOV BYTE [GS: 0X0c], '*'
+    ; MOV BYTE [GS: 0X0d], 0XA4
 
 
     ;读取硬盘
@@ -112,7 +112,23 @@ FIND_ACT_END:
     MOV [PART_ID] ,CX ;把活动分区装载进来
     MOV [ACTPART_ADDR] , BP ;地址也同时记录
     RET
+;========================================================
+;   名称：
+;       Delay
+;   功能：
+;       延时
+;========================================================    
 
+DELAY:
+    MOV CX , 0xFF;
+    .0:
+    MOV AX , 0xEFFF;
+    .1:
+        DEC Ax;
+        jnz .1
+    DEC CX;
+    jnz .0
+    ret
 
 ;========================================================
 ;   名称：

@@ -42,11 +42,11 @@ SECTION MBR VSTART=MBR_BASE_ADDR
 			       ; 下标从0开始，所以0x18=24,0x4f=79
     INT 10H
 
-    MOV BYTE [GS: 0X00], '*'
-    MOV BYTE [GS: 0X01], 0XA4 ; A表示绿色背景闪烁，4表示前景色为红色
+    ; MOV BYTE [GS: 0X00], '*'
+    ; MOV BYTE [GS: 0X01], 0XA4 ; A表示绿色背景闪烁，4表示前景色为红色
 
-    MOV BYTE [GS: 0X02], '*'
-    MOV BYTE [GS: 0X03], 0XA4
+    ; MOV BYTE [GS: 0X02], '*'
+    ; MOV BYTE [GS: 0X03], 0XA4
 
     MOV BYTE [GS: 0X04], 'M'
     MOV BYTE [GS: 0X05], 0XA4
@@ -57,11 +57,11 @@ SECTION MBR VSTART=MBR_BASE_ADDR
     MOV BYTE [GS: 0X08], 'R'
     MOV BYTE [GS: 0X09], 0XA4
 
-    MOV BYTE [GS: 0X0a], '*'
-    MOV BYTE [GS: 0X0b], 0XA4
+    ; MOV BYTE [GS: 0X0a], '*'
+    ; MOV BYTE [GS: 0X0b], 0XA4
 
-    MOV BYTE [GS: 0X0c], '*'
-    MOV BYTE [GS: 0X0d], 0XA4
+    ; MOV BYTE [GS: 0X0c], '*'
+    ; MOV BYTE [GS: 0X0d], 0XA4
 
 
     ;读取硬盘
@@ -80,6 +80,23 @@ SECTION MBR VSTART=MBR_BASE_ADDR
 
     CALL READ_DISK;
     JMP BOOTSECT_BASE_ADDR;
+;========================================================
+;   名称：
+;       Delay
+;   功能：
+;       延时
+;========================================================    
+
+DELAY:
+    MOV CX , 0xFF;
+    .0:
+    MOV AX , 0xEFFF;
+    .1:
+        DEC Ax;
+        jnz .1
+    DEC CX;
+    jnz .0
+    ret
 
 ;========================================================
 ;   名称：
@@ -306,6 +323,47 @@ READ_DISK:
         PART_ID db "0"
         ACTPART_ADDR db "00"
 
+; 打印字符 把al 打印到屏幕上 
+; ; 输入：AL = 要打印的字节
+;     ; 输出：无
+
+;     push ax
+;     push bx
+;     push cx
+;     push dx
+
+;     mov bx, ax          ; 备份AX到BX
+;     shr al, 4            ; 取高4位
+;     call HexToASCII     ; 转换为ASCII字符
+;     mov ah, 0x0E        ; AH = 0x0E，显示字符的BIOS功能号
+;     mov bh, 0x00        ; 页号为0，通常是文本模式的页号
+;     mov cx, 0x0001      ; 打印字符的次数，这里是1
+;     mov dl, al          ; 要打印的字符
+;     int 0x10            ; 调用BIOS中断显示字符
+
+;     mov al, bl          ; 恢复备份的AL
+;     and al, 0x0F        ; 取低4位
+;     call HexToASCII     ; 转换为ASCII字符
+;     mov dl, al          ; 要打印的字符
+;     int 0x10            ; 调用BIOS中断显示字符
+
+;     pop dx
+;     pop cx
+;     pop bx
+;     pop ax
+;     ret
+
+; HexToASCII:
+;     ; 输入：AL = 十六进制数字（0-15）
+;     ; 输出：AL = ASCII字符
+
+;     cmp al, 9
+;     jbe .is_digit
+;     add al, 7
+; .is_digit:
+;     add al, '0'
+;     ret
+
 ;分区表
 ;第1字节 引导标志。若值为80H表示活动分区，若值为00H表示非活动分区
 ;第2、3、4字节 本分区的起始磁头号、扇区号、柱面号。
@@ -342,3 +400,11 @@ DISK_PARTITIONED_TABLE3:
 ;结束标志符
 times 510-($-$$) db 0
 db 0x55,0xaa
+
+
+80 
+20 21 00 
+0C 
+FE FF FF 
+00 08 00 00 
+20 B9 A0 03
